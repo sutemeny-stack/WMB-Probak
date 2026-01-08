@@ -5,44 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Január Próbák</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
     .day-box {
-      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      text-[10px];
+      font-size: 10px;
       border-bottom: 1px solid #e5e7eb;
       height: 1.75rem;
       user-select: none;
+      white-space: nowrap;
       transition: background-color 0.2s;
     }
 
     .marked { background-color: #4ade80; }
 
-    .section-Sebi { background-color: #fde68a; }   /* halvány sárga */
-    .section-Milán { background-color: #bfdbfe; }  /* halvány kék */
-    .section-Fóri { background-color: #d9f99d; }   /* halvány zöld */
-    .section-Süti { background-color: #fbcfe8; }   /* halvány rózsaszín */
+    .section-Sebi  { background-color: #fde68a; }
+    .section-Milán { background-color: #bfdbfe; }
+    .section-Fóri  { background-color: #d9f99d; }
+    .section-Süti  { background-color: #fbcfe8; }
 
-    .day-wrapper { border-radius:0.5rem; border:1px solid #e5e7eb; background:white; display:flex; flex-direction:column; font-size:10px; }
+    .day-wrapper {
+      min-width: 140px;      /* 🔥 iOS miatt */
+      flex-shrink: 0;        /* 🔥 EZ TESZI SCROLL-OZHATÓVÁ */
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      font-size: 10px;
+    }
   </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen p-4">
   <div class="max-w-7xl mx-auto">
     <h1 class="text-2xl font-bold mb-4">Január Próbák</h1>
 
+    <!-- 🔹 iOS-biztos vízszintes scroll -->
     <div class="overflow-x-auto">
-  <div id="calendar" class="grid grid-cols-7 gap-4 min-w-[900px]"></div>
-</div>
+      <div id="calendar" class="flex gap-4 w-max"></div>
+    </div>
 
-    <button id="saveBtn" class="px-4 py-2 mt-4 bg-indigo-500 text-white rounded hover:bg-indigo-600">Mentés</button>
+    <button id="saveBtn"
+      class="px-4 py-2 mt-4 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+      Mentés
+    </button>
 
-    <p class="text-xs text-gray-500 mt-3">Kattintással jelölhetsz időpontokat. Mentés gombbal elmentheted az aktuális állapotot.</p>
+    <p class="text-xs text-gray-500 mt-3">
+      Kattintással jelölhetsz időpontokat. A Mentés gomb elmenti az állapotot.
+    </p>
   </div>
 
   <script>
@@ -63,55 +81,61 @@
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     const hours = Array.from({ length: 8 }, (_, i) => 14 + i);
     const sections = ["Sebi", "Milán", "Fóri", "Süti"];
-    const sectionColors = { "Sebi": 'section-Sebi', "Milán": 'section-Milán', "Fóri": 'section-Fóri', "Süti": 'section-Süti' };
+    const sectionColors = {
+      "Sebi": "section-Sebi",
+      "Milán": "section-Milán",
+      "Fóri": "section-Fóri",
+      "Süti": "section-Süti"
+    };
     const weekdays = ["Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat","Vasárnap"];
     const selected = {};
 
     function weekdayLabel(year, month, day) {
-      const js = new Date(year, month -1, day);
-      return weekdays[(js.getDay()+6)%7];
+      const js = new Date(year, month - 1, day);
+      return weekdays[(js.getDay() + 6) % 7];
     }
 
-    function toggle(key){
+    function toggle(key) {
       selected[key] = !selected[key];
       render();
     }
 
-    function render(){
-      const container = document.getElementById('calendar');
-      container.innerHTML = '';
-      container.className = 'grid grid-cols-7 gap-2';
+    function render() {
+      const container = document.getElementById("calendar");
+      container.innerHTML = "";
 
-      const jan1 = new Date(2026,0,1);
-      const leadingEmpty = (jan1.getDay()+6)%7;
-      for(let i=0;i<leadingEmpty;i++){
-        container.appendChild(document.createElement('div'));
+      const jan1 = new Date(2026, 0, 1);
+      const leadingEmpty = (jan1.getDay() + 6) % 7;
+
+      for (let i = 0; i < leadingEmpty; i++) {
+        container.appendChild(document.createElement("div"));
       }
 
       days.forEach(day => {
-        const dayWrapper = document.createElement('div');
-        dayWrapper.className = 'day-wrapper';
+        const dayWrapper = document.createElement("div");
+        dayWrapper.className = "day-wrapper";
 
-        const header = document.createElement('div');
-        header.className = 'px-1 py-1 font-semibold text-center border-b';
-        header.textContent = `Jan ${day} — ${weekdayLabel(2026,1,day)}`;
+        const header = document.createElement("div");
+        header.className = "px-1 py-1 font-semibold text-center border-b";
+        header.innerHTML = `Jan ${day}<br><span class="font-normal">${weekdayLabel(2026,1,day)}</span>`;
         dayWrapper.appendChild(header);
 
-        const grid = document.createElement('div');
-        grid.className = 'grid grid-cols-4';
+        const grid = document.createElement("div");
+        grid.className = "grid grid-cols-4";
+
         sections.forEach(section => {
-          const col = document.createElement('div');
+          const col = document.createElement("div");
+
           hours.forEach(hour => {
-            const key = `2026-01-${String(day).padStart(2,'0')}-${hour}-${section}`;
-            const isOn = !!selected[key];
-            const box = document.createElement('div');
-            box.className = `day-box ${isOn ? 'marked' : 'bg-white hover:bg-indigo-50'}`;
-            box.innerText = `${hour}:00`;
+            const key = `2026-01-${String(day).padStart(2,"0")}-${hour}-${section}`;
+            const box = document.createElement("div");
+            box.className = `day-box ${selected[key] ? "marked" : "bg-white hover:bg-indigo-50"}`;
+            box.textContent = `${hour}:00`;
             box.onclick = () => toggle(key);
             col.appendChild(box);
           });
 
-          const label = document.createElement('div');
+          const label = document.createElement("div");
           label.className = `text-center text-[10px] font-medium border-t ${sectionColors[section]}`;
           label.textContent = section;
           col.appendChild(label);
@@ -125,20 +149,20 @@
     }
 
     // 🔹 Betöltés Firestore-ból
-    db.collection("votes").get().then(snapshot=>{
-      snapshot.forEach(doc=>{
+    db.collection("votes").get().then(snapshot => {
+      snapshot.forEach(doc => {
         selected[doc.id] = doc.data().marked;
       });
       render();
     });
 
-    // 🔹 Mentés gomb
-    document.getElementById('saveBtn').onclick = () => {
-      for(const key in selected){
+    // 🔹 Mentés
+    document.getElementById("saveBtn").onclick = () => {
+      for (const key in selected) {
         db.collection("votes").doc(key).set({ marked: selected[key] });
       }
-      alert("Mentés megtörtént!");
-    }
+      alert("Mentés kész!");
+    };
 
     window.onload = render;
   </script>
