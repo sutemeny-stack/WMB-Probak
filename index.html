@@ -20,8 +20,8 @@
       border-bottom: 1px solid #e5e7eb;
       height: 1.75rem;
       user-select: none;
-      white-space: nowrap;
       transition: background-color 0.2s;
+      white-space: nowrap;
     }
 
     .marked { background-color: #4ade80; }
@@ -32,8 +32,7 @@
     .section-Süti  { background-color: #fbcfe8; }
 
     .day-wrapper {
-      min-width: 140px;      /* 🔥 iOS miatt */
-      flex-shrink: 0;        /* 🔥 EZ TESZI SCROLL-OZHATÓVÁ */
+      min-width: 120px;              /* 🔹 EZ A KULCS MOBILON */
       border-radius: 0.5rem;
       border: 1px solid #e5e7eb;
       background: white;
@@ -48,9 +47,9 @@
   <div class="max-w-7xl mx-auto">
     <h1 class="text-2xl font-bold mb-4">Január Próbák</h1>
 
-    <!-- 🔹 iOS-biztos vízszintes scroll -->
+    <!-- 🔹 Mobilon vízszintes scroll -->
     <div class="overflow-x-auto">
-      <div id="calendar" class="flex gap-4 w-max"></div>
+      <div id="calendar" class="grid grid-cols-7 gap-4 min-w-[900px]"></div>
     </div>
 
     <button id="saveBtn"
@@ -106,7 +105,6 @@
 
       const jan1 = new Date(2026, 0, 1);
       const leadingEmpty = (jan1.getDay() + 6) % 7;
-
       for (let i = 0; i < leadingEmpty; i++) {
         container.appendChild(document.createElement("div"));
       }
