@@ -27,7 +27,7 @@
 
     .section-Sebi  { background-color: #fde68a; }
     .section-Milán { background-color: #bfdbfe; }
-    .section-Fóri  { background-color: #d9f99d; }
+    .section-Flóri  { background-color: #d9f99d; }
     .section-Süti  { background-color: #fbcfe8; }
 
     .day-wrapper {
@@ -100,11 +100,11 @@ const year = 2026;
 let currentMonth = 7; // fallback
 
 const hours = Array.from({ length: 8 }, (_, i) => 14 + i);
-const sections = ["Sebi", "Milán", "Fóri", "Süti"];
+const sections = ["Sebi", "Milán", "Flóri", "Süti"];
 const sectionColors = {
   Sebi: "section-Sebi",
   Milán: "section-Milán",
-  Fóri: "section-Fóri",
+  Flóri: "section-Flóri",
   Süti: "section-Süti"
 };
 
@@ -237,3 +237,4 @@ document.getElementById("monthSelect").onchange = e => {
 </script>
 </body>
 </html>
+
