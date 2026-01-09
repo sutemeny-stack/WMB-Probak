@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Próbák – 2026</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -20,8 +21,6 @@
       border-bottom: 1px solid #e5e7eb;
       height: 1.75rem;
       user-select: none;
-      transition: background-color 0.2s;
-      white-space: nowrap;
     }
 
     .marked { background-color: #4ade80; }
@@ -41,7 +40,6 @@
       font-size: 10px;
     }
 
-    /* 🔥 Aktuális nap */
     .current-day {
       outline: 3px solid #ef4444;
       outline-offset: -3px;
@@ -50,194 +48,192 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen p-4">
-  <div class="max-w-7xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4">Próbák – 2026</h1>
+<div class="max-w-7xl mx-auto">
 
-    <!-- Hónapválasztó -->
-    <div class="mb-4 flex items-center gap-3">
-      <label for="monthSelect" class="font-medium">Hónap:</label>
-      <select id="monthSelect" class="border rounded px-2 py-1">
-        <option value="1">Január</option>
-        <option value="2">Február</option>
-        <option value="3">Március</option>
-        <option value="4">Április</option>
-        <option value="5">Május</option>
-        <option value="6">Június</option>
-        <option value="7">Július</option>
-        <option value="8">Augusztus</option>
-        <option value="9">Szeptember</option>
-        <option value="10">Október</option>
-        <option value="11">November</option>
-        <option value="12">December</option>
-      </select>
-    </div>
+  <h1 class="text-2xl font-bold mb-4">Próbák – 2026</h1>
 
-    <div class="overflow-x-auto">
-      <div id="calendar" class="grid grid-cols-5 gap-4 min-w-[900px]"></div>
-    </div>
-
-    <button id="saveBtn"
-      class="px-4 py-2 mt-4 bg-indigo-500 text-white rounded hover:bg-indigo-600">
-      Mentés
-    </button>
+  <!-- Hónapválasztó -->
+  <div class="mb-4 flex items-center gap-3">
+    <label class="font-medium">Hónap:</label>
+    <select id="monthSelect" class="border rounded px-2 py-1">
+      <option value="1">Január</option>
+      <option value="2">Február</option>
+      <option value="3">Március</option>
+      <option value="4">Április</option>
+      <option value="5">Május</option>
+      <option value="6">Június</option>
+      <option value="7">Július</option>
+      <option value="8">Augusztus</option>
+      <option value="9">Szeptember</option>
+      <option value="10">Október</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
   </div>
 
-  <script>
-    // 🔹 Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0KlQPh9VO54JBCL-kkNsAgdw4W5IYwXY",
-      authDomain: "wmb-probak.firebaseapp.com",
-      projectId: "wmb-probak",
-      storageBucket: "wmb-probak.firebasestorage.app",
-      messagingSenderId: "187067263796",
-      appId: "1:187067263796:web:b04190c2a8152207dc1361"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  <div class="overflow-x-auto">
+    <!-- 5 oszlop = H–P -->
+    <div id="calendar" class="grid grid-cols-5 gap-4 min-w-[900px]"></div>
+  </div>
 
-    // 🔹 Alapadatok
-    const year = 2026;
-    let currentMonth = 7;
+  <button id="saveBtn"
+    class="px-4 py-2 mt-4 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+    Mentés
+  </button>
 
-    const hours = Array.from({ length: 8 }, (_, i) => 14 + i);
-    const sections = ["Sebi", "Milán", "Fóri", "Süti"];
-    const sectionColors = {
-      "Sebi": "section-Sebi",
-      "Milán": "section-Milán",
-      "Fóri": "section-Fóri",
-      "Süti": "section-Süti"
-    };
+</div>
 
-    const weekdays = ["Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat","Vasárnap"];
-    const monthNames = [
-      "Január","Február","Március","Április","Május","Június",
-      "Július","Augusztus","Szeptember","Október","November","December"
-    ];
+<script>
+/* ================= Firebase ================= */
 
-    const selected = {};
+firebase.initializeApp({
+  apiKey: "AIzaSyB0KlQPh9VO54JBCL-kkNsAgdw4W5IYwXY",
+  authDomain: "wmb-probak.firebaseapp.com",
+  projectId: "wmb-probak"
+});
 
-    function daysInMonth(year, month) {
-      return new Date(year, month, 0).getDate();
+const db = firebase.firestore();
+
+/* ================= Alapadatok ================= */
+
+const year = 2026;
+let currentMonth = 7; // fallback
+
+const hours = Array.from({ length: 8 }, (_, i) => 14 + i);
+const sections = ["Sebi", "Milán", "Fóri", "Süti"];
+const sectionColors = {
+  Sebi: "section-Sebi",
+  Milán: "section-Milán",
+  Fóri: "section-Fóri",
+  Süti: "section-Süti"
+};
+
+const weekdays = ["Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat","Vasárnap"];
+const monthNames = [
+  "Január","Február","Március","Április","Május","Június",
+  "Július","Augusztus","Szeptember","Október","November","December"
+];
+
+const selected = {};
+
+/* ================= Segédek ================= */
+
+const daysInMonth = (y,m) => new Date(y,m,0).getDate();
+const isWeekend = (y,m,d) => [0,6].includes(new Date(y,m-1,d).getDay());
+const isToday = (y,m,d) => {
+  const n = new Date();
+  return n.getFullYear()===y && n.getMonth()+1===m && n.getDate()===d;
+};
+
+/* ================= Render ================= */
+
+function render() {
+  const container = document.getElementById("calendar");
+  container.innerHTML = "";
+
+  // ---- Hétfőre igazítás (EZ A LÉNYEG) ----
+  const firstDay = new Date(year, currentMonth - 1, 1);
+  const firstWeekday = (firstDay.getDay() + 6) % 7; // hétfő=0
+
+  // üres helyek hétfőig (csak munkanapok!)
+  for (let i = 0; i < firstWeekday; i++) {
+    if (i < 5) {
+      container.appendChild(document.createElement("div"));
+    }
+  }
+
+  // ---- Napok ----
+  for (let day = 1; day <= daysInMonth(year, currentMonth); day++) {
+    if (isWeekend(year, currentMonth, day)) continue;
+
+    const wrap = document.createElement("div");
+    wrap.className = "day-wrapper";
+    if (isToday(year, currentMonth, day)) {
+      wrap.classList.add("current-day");
     }
 
-    function weekdayLabel(year, month, day) {
-      const js = new Date(year, month - 1, day);
-      return weekdays[(js.getDay() + 6) % 7];
-    }
+    const header = document.createElement("div");
+    header.className = "text-center border-b font-semibold p-1";
+    header.innerHTML = `
+      ${monthNames[currentMonth-1]} ${day}<br>
+      <span class="font-normal">
+        ${weekdays[(new Date(year,currentMonth-1,day).getDay()+6)%7]}
+      </span>
+    `;
+    wrap.appendChild(header);
 
-    function isWeekend(year, month, day) {
-      const d = new Date(year, month - 1, day).getDay();
-      return d === 0 || d === 6;
-    }
+    const grid = document.createElement("div");
+    grid.className = "grid grid-cols-4";
 
-    function isToday(year, month, day) {
-      const now = new Date();
-      return (
-        now.getFullYear() === year &&
-        now.getMonth() + 1 === month &&
-        now.getDate() === day
-      );
-    }
+    sections.forEach(section => {
+      const col = document.createElement("div");
 
-    function toggle(key) {
-      selected[key] = !selected[key];
-      render();
-    }
+      hours.forEach(hour => {
+        const key =
+          `${year}-${String(currentMonth).padStart(2,"0")}-${String(day).padStart(2,"0")}-${hour}-${section}`;
 
-    function render() {
-      const container = document.getElementById("calendar");
-      container.innerHTML = "";
-
-      const days = daysInMonth(year, currentMonth);
-
-      const firstDay = new Date(year, currentMonth - 1, 1);
-      const firstWeekday = (firstDay.getDay() + 6) % 7;
-      const leadingEmpty = Math.min(firstWeekday, 5);
-
-      for (let i = 0; i < leadingEmpty; i++) {
-        container.appendChild(document.createElement("div"));
-      }
-
-      for (let day = 1; day <= days; day++) {
-        if (isWeekend(year, currentMonth, day)) continue;
-
-        const dayWrapper = document.createElement("div");
-        dayWrapper.className = "day-wrapper";
-
-        if (isToday(year, currentMonth, day)) {
-          dayWrapper.classList.add("current-day");
-        }
-
-        const header = document.createElement("div");
-        header.className = "px-1 py-1 font-semibold text-center border-b";
-        header.innerHTML = `
-          ${monthNames[currentMonth - 1]} ${day}<br>
-          <span class="font-normal">${weekdayLabel(year, currentMonth, day)}</span>
-        `;
-        dayWrapper.appendChild(header);
-
-        const grid = document.createElement("div");
-        grid.className = "grid grid-cols-4";
-
-        sections.forEach(section => {
-          const col = document.createElement("div");
-
-          hours.forEach(hour => {
-            const key = `${year}-${String(currentMonth).padStart(2,"0")}-${String(day).padStart(2,"0")}-${hour}-${section}`;
-            const box = document.createElement("div");
-            box.className = `day-box ${selected[key] ? "marked" : "bg-white hover:bg-indigo-50"}`;
-            box.textContent = `${hour}:00`;
-            box.onclick = () => toggle(key);
-            col.appendChild(box);
-          });
-
-          const label = document.createElement("div");
-          label.className = `text-center text-[10px] font-medium border-t ${sectionColors[section]}`;
-          label.textContent = section;
-          col.appendChild(label);
-
-          grid.appendChild(col);
-        });
-
-        dayWrapper.appendChild(grid);
-        container.appendChild(dayWrapper);
-      }
-    }
-
-    // 🔹 Firestore betöltés
-    db.collection("votes").get().then(snapshot => {
-      snapshot.forEach(doc => {
-        selected[doc.id] = doc.data().marked;
+        const box = document.createElement("div");
+        box.className = "day-box " + (selected[key] ? "marked" : "");
+        box.textContent = `${hour}:00`;
+        box.onclick = () => {
+          selected[key] = !selected[key];
+          render();
+        };
+        col.appendChild(box);
       });
-      render();
+
+      const label = document.createElement("div");
+      label.className = `text-center border-t ${sectionColors[section]}`;
+      label.textContent = section;
+      col.appendChild(label);
+
+      grid.appendChild(col);
     });
 
-    // 🔹 Mentés (hónap nézettel együtt)
-    document.getElementById("saveBtn").onclick = () => {
-      for (const key in selected) {
-        const [y, m, d, hour, section] = key.split("-");
+    wrap.appendChild(grid);
+    container.appendChild(wrap);
+  }
+}
 
-        db.collection("votes").doc(key).set({
-          year: Number(y),
-          month: Number(m),
-          day: Number(d),
-          hour: Number(hour),
-          section: section,
-          marked: selected[key],
-          monthView: `${y}-${m}`
-        });
-      }
-      alert("Mentés kész!");
-    };
+/* ================= Init ================= */
 
-    // 🔹 Hónapváltás
-    document.getElementById("monthSelect").value = currentMonth;
-    document.getElementById("monthSelect").onchange = e => {
-      currentMonth = parseInt(e.target.value);
-      render();
-    };
+async function init() {
+  // UI állapot
+  const uiDoc = await db.collection("meta").doc("ui").get();
+  if (uiDoc.exists) {
+    currentMonth = uiDoc.data().currentMonth;
+  }
+  document.getElementById("monthSelect").value = currentMonth;
 
-    window.onload = render;
-  </script>
+  // Szavazatok
+  const snap = await db.collection("votes").get();
+  snap.forEach(d => selected[d.id] = d.data().marked);
+
+  render();
+}
+
+init();
+
+/* ================= Mentés ================= */
+
+document.getElementById("saveBtn").onclick = async () => {
+  await db.collection("meta").doc("ui").set({ currentMonth });
+
+  for (const key in selected) {
+    await db.collection("votes").doc(key).set({
+      marked: selected[key]
+    });
+  }
+
+  alert("Mentés kész!");
+};
+
+/* ================= Hónapváltás ================= */
+
+document.getElementById("monthSelect").onchange = e => {
+  currentMonth = Number(e.target.value);
+  render();
+};
+</script>
 </body>
 </html>
