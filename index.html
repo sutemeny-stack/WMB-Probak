@@ -26,9 +26,9 @@
     .marked { background-color: #4ade80; }
 
     .section-Sebi  { background-color: #fde68a; }
-    .section-Milán { background-color: #bfdbfe; }
-    .section-Flóri  { background-color: #d9f99d; }
-    .section-Süti  { background-color: #fbcfe8; }
+    .section-Milan { background-color: #bfdbfe; }
+    .section-Flori  { background-color: #d9f99d; }
+    .section-Suti  { background-color: #fbcfe8; }
 
     .day-wrapper {
       min-width: 120px;
@@ -100,12 +100,12 @@ const year = 2026;
 let currentMonth = 7; // fallback
 
 const hours = Array.from({ length: 8 }, (_, i) => 14 + i);
-const sections = ["Sebi", "Milán", "Flóri", "Süti"];
+const sections = ["Sebi", "Milan", "Flori", "Suti"];
 const sectionColors = {
   Sebi: "section-Sebi",
-  Milán: "section-Milán",
-  Flóri: "section-Flóri",
-  Süti: "section-Süti"
+  Milan: "section-Milan",
+  Flori: "section-Flori",
+  Suti: "section-Suti"
 };
 
 const weekdays = ["Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat","Vasárnap"];
@@ -237,4 +237,5 @@ document.getElementById("monthSelect").onchange = e => {
 </script>
 </body>
 </html>
+
 
