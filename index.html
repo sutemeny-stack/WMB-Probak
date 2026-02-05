@@ -217,11 +217,15 @@ init();
 /* ================= Mentés ================= */
 
 document.getElementById("saveBtn").onclick = async () => {
+
+  // 1️⃣ Hónap mentése
   await db.collection("meta").doc("ui").set({ currentMonth });
 
+  // 2️⃣ Votes mentése a jelszóval
   for (const key in selected) {
     await db.collection("votes").doc(key).set({
-      marked: selected[key]
+      marked: selected[key],
+      secret: "wmb2003"  // <-- ide a saját jelszavad
     });
   }
 
@@ -237,5 +241,6 @@ document.getElementById("monthSelect").onchange = e => {
 </script>
 </body>
 </html>
+
 
 
