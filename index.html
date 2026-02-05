@@ -218,18 +218,27 @@ init();
 
 document.getElementById("saveBtn").onclick = async () => {
 
-  // 1️⃣ Hónap mentése
-  await db.collection("meta").doc("ui").set({ currentMonth });
+  try {
+    // Meta mentése
+    await db.collection("meta").doc("ui").set({ currentMonth });
 
-  // 2️⃣ Votes mentése a jelszóval
-  for (const key in selected) {
-    await db.collection("votes").doc(key).set({
-      marked: selected[key],
-      secret: "hobbi123"  // <-- ide a saját jelszavad
-    });
+    // Votes mentése párhuzamosan
+    const writes = [];
+    for (const key in selected) {
+      writes.push(
+        db.collection("votes").doc(key).set({
+          marked: selected[key],
+          secret: "hobbi123"
+        })
+      );
+    }
+    await Promise.all(writes);
+
+    alert("Mentés kész!");
+  } catch (e) {
+    console.error("Mentés hiba:", e);
+    alert("Hiba történt a mentés során!");
   }
-
-  alert("Mentés kész!");
 };
 
 /* ================= Hónapváltás ================= */
@@ -241,6 +250,7 @@ document.getElementById("monthSelect").onchange = e => {
 </script>
 </body>
 </html>
+
 
 
 
