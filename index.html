@@ -218,16 +218,15 @@ init();
 
 document.getElementById("saveBtn").onclick = async () => {
 
-  // 1️⃣ Hónap mentése
-  await db.collection("meta").doc("ui").set({ currentMonth });
+  const monthId = `${year}-${String(currentMonth).padStart(2,"0")}`;
 
-  // 2️⃣ Votes mentése a jelszóval
-  for (const key in selected) {
-    await db.collection("votes").doc(key).set({
-      marked: selected[key],
-      secret: "wmb2003"  // <-- ide a saját jelszavad
-    });
-  }
+  await db.collection("months").doc(monthId).set({
+    secret: "hobbi123",
+    selected: selected
+  });
+
+  // Meta mentés (hónapválasztó)
+  await db.collection("meta").doc("ui").set({ currentMonth });
 
   alert("Mentés kész!");
 };
@@ -241,6 +240,7 @@ document.getElementById("monthSelect").onchange = e => {
 </script>
 </body>
 </html>
+
 
 
 
